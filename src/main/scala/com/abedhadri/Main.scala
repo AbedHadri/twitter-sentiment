@@ -38,7 +38,7 @@ object Main extends App {
           log.info("Done")
           System.exit(0)
         case Failure(e) =>
-          println("An error occurred " + e)
+          log.error("An error occurred ", e)
           System.exit(1)
       }
   }
