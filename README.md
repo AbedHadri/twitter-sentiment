@@ -9,3 +9,5 @@ you can play around with those terms using the configs `negative-terms` or `posi
 
 make sure you generate consumer tokens as well as access tokens from your twitter account 
 as explained here : https://developer.twitter.com/ja/docs/basics/authentication/guides/access-tokens.
+
+to see how it works please check the test cases.
