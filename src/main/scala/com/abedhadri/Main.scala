@@ -24,8 +24,13 @@ object Main extends App {
   main()
 
   def main(): Unit = {
-    bootstrapTwitterStream()
-      .viaMat(KillSwitches.single)(Keep.both)
+    bootstrapFromSource(
+      Source
+        .futureSource(
+          twitterClient.getWithKeywordFilter(config.stream.filteredTerm)
+        ),
+      config.stream
+    ).viaMat(KillSwitches.single)(Keep.both)
       .runWith(Sink.seq)
       .onComplete {
         case Success(results) =>
@@ -38,23 +43,13 @@ object Main extends App {
       }
   }
 
-  def bootstrapTwitterStream() = {
-    Source
-      .futureSource(
-        twitterClient.getWithKeywordFilter(config.stream.filteredTerm)
-      )
-      .take(config.stream.maxTermCount)
-      .completionTimeout(config.stream.runDuration.toSeconds.seconds)
-      .groupBy(
-        config.stream.maxTermCount,
-        _.user.id,
-        allowClosedSubstreamRecreation = true
-      )
-      .fold(UserTweets.generateDefault)(
-        (acc, entry) =>
-          acc.copy(user = entry.user, tweets = acc.tweets :+ entry)
-      )
-      .mergeSubstreams
+  def bootstrapFromSource(source: Source[TweetEntry, Any],
+                          config: StreamConfig) = {
+    source
+      .take(config.maxTermCount)
+      .via(SentimentDetectFlow(config))
+      .via(InsightExtractFlow())
+
   }
 
 }

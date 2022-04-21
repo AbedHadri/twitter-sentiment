@@ -1,7 +1,6 @@
 package com.abedhadri
 
 import scala.annotation.nowarn
-import scala.concurrent.duration.Duration
 import scala.util.Try
 
 import akka.http.scaladsl.model.Uri
@@ -11,9 +10,11 @@ import pureconfig.generic.auto._
 
 case class AppConfig(stream: StreamConfig, twitter: TwitterConfig)
 
-case class StreamConfig(runDuration: Duration,
-                        maxTermCount: Int,
-                        filteredTerm: String)
+case class StreamConfig(maxTermCount: Int,
+                        filteredTerm: String,
+                        positiveTerms: List[String],
+                        negativeTerms: List[String],
+)
 
 case class TwitterConfig(streamEndpoint: String,
                          access: AccessCredentials,
